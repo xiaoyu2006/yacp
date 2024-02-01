@@ -1,0 +1,27 @@
+on: [push, pull_request]
+name: CI
+jobs:
+  build:
+    name: "Build on Racket '${{ matrix.racket-version }}', on ${{ matrix.racket-variant }} and ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        racket-version: ["stable"]
+        racket-variant: ["CS"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: Bogdanp/setup-racket@v1.11
+        with:
+          architecture: x64
+          distribution: full
+          variant: ${{ matrix.racket-variant }}
+          version: ${{ matrix.racket-version }}
+      - name: Installing yacp and its dependencies
+        run: raco pkg install --no-docs --auto --name yacp
+      - name: Compiling yacp and building its docs
+        run: raco setup --check-pkg-deps --unused-pkg-deps yacp
+      - name: Testing yacp
+        run: raco test -x -p yacp
