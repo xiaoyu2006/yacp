@@ -15,7 +15,12 @@
 ;  ; Other Stuff
 ;  struct define set! if begin)
 
-(struct csrc (str)) ;; Wrapper for C source code
+(struct csrc (str)
+  #:guard (lambda (x name)
+            (unless (string? x)
+              (error 'csrc "Expected a string"))
+            x)
+  #:transparent) ;; Wrapper for C source code
 (define s~ csrc-str) ;; Shortcut for unwrapping csrc
 
 (provide (struct-out csrc) s~)

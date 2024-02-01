@@ -10,13 +10,12 @@
 
 (require "yacp.rkt")
 (require racket/string)
-(require racket/format)
 (define yacp-eval  ;; TODO: Figure out how to embed module in the executable AND make-evaluator
   (lambda (sexpr)
     (eval sexpr (namespace-anchor->namespace yacp-ns))))
 (define (eval-and-emit sexpr-list)
   ;; Evaluate every s-expression and concate them to a string if it's an instance of csrc
-  (string-join (filter csrc? (map (compose1 ~a yacp-eval) sexpr-list))
+  (string-join (map s~ (filter csrc? (map yacp-eval sexpr-list)))
                "\n"
                #:after-last "\n"))
 
