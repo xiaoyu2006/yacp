@@ -1,0 +1,38 @@
+name: Update Docs
+
+on:
+  push:
+    branches: [ "dev" ]
+
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Install Racket
+      - name: Install Racket
+        uses: Bogdanp/setup-racket@v1.11
+        with:
+          architecture: 'x64'
+          distribution: 'full'
+          variant: 'CS'
+          version: 'stable'
+
+      - name: Installing yacp and its dependencies
+        run: raco pkg install --no-docs --auto --name yacp
+      - name: Compiling yacp and building its docs
+        run: raco setup --check-pkg-deps --unused-pkg-deps yacp
+      - name: Push to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: doc/yacp
+          branch: gh-pages
